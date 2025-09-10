@@ -5,7 +5,7 @@ import '../features/auth/presentation/providers/auth_providers.dart';
 import '../features/auth/presentation/pages/login_page.dart';
 import '../features/onboarding/presentation/providers/onboarding_provider.dart';
 import '../features/onboarding/presentation/screens/onboarding_screen.dart';
-import '../dummy/dummy_home_screen.dart';
+import '../features/home/home_screen.dart';
 import '../core/theme/app_colors.dart';
 
 class AuthWrapper extends ConsumerWidget {
@@ -199,7 +199,7 @@ class AuthWrapper extends ConsumerWidget {
                 }
 
                 // User is authenticated and onboarding is completed
-                return const DummyHomeScreen();
+                return const HomeScreen();
               },
             );
           },
