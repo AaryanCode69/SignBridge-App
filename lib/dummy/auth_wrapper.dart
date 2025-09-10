@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../features/auth/presentation/providers/auth_providers.dart';
 import '../features/auth/presentation/pages/login_page.dart';
+import '../features/onboarding/presentation/providers/onboarding_provider.dart';
+import '../features/onboarding/presentation/screens/onboarding_screen.dart';
 import '../dummy/dummy_home_screen.dart';
 import '../core/theme/app_colors.dart';
 
@@ -161,8 +163,45 @@ class AuthWrapper extends ConsumerWidget {
               return const LoginPage();
             }
 
-            // User is authenticated, show dummy home screen
-            return const DummyHomeScreen();
+            // User is authenticated, now check onboarding status
+            final onboardingStatus = ref.watch(onboardingStatusProvider);
+
+            return onboardingStatus.when(
+              loading: () => const Scaffold(
+                backgroundColor: AppColors.backgroundStart,
+                body: Center(
+                  child: CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      AppColors.primary,
+                    ),
+                  ),
+                ),
+              ),
+              error: (error, stack) {
+                // If there's an error checking onboarding status,
+                // assume onboarding is needed
+                return OnboardingScreen(
+                  onComplete: () {
+                    // After onboarding completion, refresh the status
+                    ref.invalidate(onboardingStatusProvider);
+                  },
+                );
+              },
+              data: (isOnboardingCompleted) {
+                if (!isOnboardingCompleted) {
+                  // Show onboarding
+                  return OnboardingScreen(
+                    onComplete: () {
+                      // After onboarding completion, refresh the status
+                      ref.invalidate(onboardingStatusProvider);
+                    },
+                  );
+                }
+
+                // User is authenticated and onboarding is completed
+                return const DummyHomeScreen();
+              },
+            );
           },
         );
       },
